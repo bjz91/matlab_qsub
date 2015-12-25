@@ -1,0 +1,84 @@
+\documentclass{ctexart}
+
+\usepackage{amsmath}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{xcolor}
+\usepackage{framed}
+\usepackage{fancyvrb}
+\usepackage{fontspec}
+\newfontfamily\menlo{Menlo}
+\usepackage{listings}
+\usepackage{mdwlist}
+\lstset{language=Matlab}%代码语言使用的是matlab
+\lstset{breaklines}%自动将长的代码行换行排版
+\lstset{extendedchars=false}%解决代码跨页时，章节标题，页眉等汉字不显示的问题
+\usepackage[a4paper,margin=1in]{geometry} 
+
+
+\title{\bf 课题组服务器matlab程序qsub提交方法 (v1.1)}
+\author{}
+\date{}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+\maketitle 
+
+\thispagestyle{empty}
+
+\vspace{-0.5in}
+
+本文档最新版本点此下载：
+
+\url{https://github.com/bjz91/matlab_qsub/raw/master/matlab_qsub.pdf}
+
+\section{编写脚本文件}
+直接复制下方代码，修改\textcolor{blue}{蓝色}字体显示的参数，保存为脚本文件（不需要扩展名）
+\begin{Verbatim}[frame=single,framesep=1mm,baselinestretch=0.8,commandchars=\\\{\}]
+#!/bin/sh
+
+#PBS -N \textcolor{blue}{TASK_NAME}
+#PBS -l nodes=1:ppn=1
+#PBS -j oe
+#PBS -o \textcolor{blue}{$LOG_FILE_PATH}
+
+cd \textcolor{blue}{$M_FILE_PATH}
+/gl/tools/run/Matlab/R2013b/bin/matlab  -nodesktop -nosplash -r \textcolor{blue}{M_FILE_NAME}
+\end{Verbatim}
+
+其中各项参数的意义是：
+\begin{itemize*}
+\item \texttt{TASK\_NAME}: 本次提交的任务名，可取任意名称以区分不同任务
+\item \texttt{\$LOG\_FILE\_PATH}：运行结束后log文件存放地址的\textbf{绝对路径}，可任意设置
+\item \texttt{\$M\_FILE\_PATH}：m文件所在文件夹的\textbf{绝对路径}
+\item \texttt{M\_FILE\_NAME}：m文件名称（无须加上``.m''后缀）
+\end{itemize*}
+
+\section{提交任务}
+\begin{Verbatim}[frame=single,framesep=1mm,baselinestretch=0.8,commandchars=\\\{\}]
+$ qsub SCRIPT_NAME\hfill{（提交任务，SCRIPT_NAME为脚本名）}
+$ qstat\hfill{（查询任务状态）}
+\end{Verbatim}
+
+\section{示例}
+\begin{Verbatim}[frame=single,framesep=1mm,baselinestretch=0.8,commandchars=\\\{\}]
+\textbf{1. m-file}: /home/bijianzhao/test/m_test.m
+
+\textbf{2. script file}: \textcolor{red}{script_test}
+
+#!/bin/sh
+
+#PBS -N \textcolor{blue}{bjz_test}
+#PBS -l nodes=1:ppn=1
+#PBS -j oe
+#PBS -o \textcolor{blue}{/home/bijianzhao/test/log}
+
+cd \textcolor{blue}{/home/bijianzhao/test}
+/gl/tools/run/Matlab/R2013b/bin/matlab  -nodesktop -nosplash -r \textcolor{blue}{m_test}
+
+\textbf{3. submission}:
+$ qsub \textcolor{red}{script_test}
+\end{Verbatim}
+
+
+\end{document}
